@@ -40,7 +40,7 @@ const Index = () => {
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="flex flex-col items-center text-center">
           <img src="/assets/rv-logo.png" alt="Rock Vntrs" className="w-64 md:w-80 lg:w-96 mix-blend-multiply" />
-          <p className="mt-6 text-sm tracking-[0.2em] uppercase text-foreground font-bold">Impact and Sustainability Advisory</p>
+          <p className="mt-6 text-sm tracking-[0.2em] uppercase text-muted-foreground font-bold">Impact and Sustainability Advisory</p>
         </div>
       </main>
 
