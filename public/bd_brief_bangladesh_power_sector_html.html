@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangladesh Power Sector: Sustainability & Decarbonisation BD Brief</title>
+    
+    <!-- Chosen Palette: Warm Neutrals & Earthy Sustainability (Stone, Emerald, Amber, Slate) -->
+    <!-- Application Structure Plan: 
+         1. Executive Dashboard (Top): Immediate macro-context (Overcapacity, Subsidies, Gen Mix) using visual charts to establish the "burning platform".
+         2. Value Chain Map (Middle): A process-flow layout built with HTML/CSS grid showing generation to off-takers, highlighting stakeholder pain points. This grounds the user in the sector's operational reality.
+         3. Thematic Opportunity Matrix (Core Interactive Element): A dynamic master-detail view. A sidebar lists the 13 research themes. Clicking a theme dynamically updates the main pane with 'Must Do', 'Struggle To Do', and explicit 'Advisory Offerings'. This allows non-linear exploration of vast qualitative data.
+         4. 90-Day BD Action Plan (Bottom): A phased timeline for immediate execution.
+         Rationale: This structure mirrors a consulting pitch preparation process: Understand the Context -> Map the Landscape -> Find the Niche (Themes) -> Execute (Plan). 
+    -->
+    <!-- Visualization & Content Choices: 
+         - Context -> Goal: Highlight financial & structural stress -> Viz: Bar Chart (Capacity vs Demand) & Doughnut (Gen Mix) -> Interaction: Hover tooltips -> Justification: Quickly communicates the crisis driving the transition -> Library: Chart.js.
+         - Value Chain -> Goal: Map actors & pressures -> Viz: Interactive Flexbox Cards with Unicode arrows -> Interaction: Hover effects to reveal details -> Justification: Clean, code-native way to show flow without external assets -> Method: HTML/Tailwind (NO SVG/Mermaid).
+         - Themes -> Goal: Organize deep qualitative research -> Viz: Interactive List + Detail Pane -> Interaction: Click list item to load data -> Justification: Prevents text fatigue, keeps user engaged, allows targeted reading -> Method: Vanilla JS DOM manipulation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 800: '#292524', 900: '#1c1917' },
+                        emerald: { 50: '#ecfdf5', 600: '#059669', 700: '#047857' },
+                        amber: { 100: '#fef3c7', 600: '#d97706' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Essential Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Custom Scrollbar for inner containers */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f5f5f4; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+        
+        .nav-item.active { background-color: #ecfdf5; border-left-width: 4px; border-left-color: #047857; font-weight: 600; color: #047857; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased font-sans flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-stone-900 tracking-tight">BD Brief: Bangladesh Power Sector</h1>
+                <p class="text-sm text-stone-500 mt-1">Sustainability & Decarbonisation Advisory Strategy (June 2026)</p>
+            </div>
+            <div class="hidden md:flex space-x-4">
+                <a href="#context" class="text-sm font-medium text-stone-600 hover:text-emerald-700 transition">Market Context</a>
+                <a href="#value-chain" class="text-sm font-medium text-stone-600 hover:text-emerald-700 transition">Value Chain</a>
+                <a href="#opportunities" class="text-sm font-medium text-stone-600 hover:text-emerald-700 transition">Advisory Niches</a>
+                <a href="#action-plan" class="text-sm font-medium text-stone-600 hover:text-emerald-700 transition">90-Day Plan</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 w-full">
+
+        <!-- 1. Executive Context Section -->
+        <section id="context" class="scroll-mt-24">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-900 border-b-2 border-emerald-600 pb-2 inline-block">The Burning Platform: System Context</h2>
+                <p class="text-stone-600 mt-3 max-w-3xl leading-relaxed">
+                    This section outlines the macroeconomic and structural drivers forcing the energy transition in Bangladesh. The sector is currently characterized by severe fossil-fuel lock-in, extreme overcapacity, and mounting financial distress for state utilities. Understanding this data is critical for positioning our advisory services not just as environmental compliance, but as existential operational and financial resilience.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Key Stats Cards -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-stone-500 uppercase tracking-wider">Installed vs Peak Demand</h3>
+                        <div class="mt-2 text-3xl font-bold text-amber-600">60%+ <span class="text-lg font-normal text-stone-500">Reserve Margin</span></div>
+                        <p class="text-sm text-stone-600 mt-2">FY2024-25 peak demand was ~17GW against ~27.4GW installed, driving unsustainable capacity payments.</p>
+                    </div>
+                    <div class="text-right mt-4"><span class="text-xl">&#9888;</span></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-stone-500 uppercase tracking-wider">Primary Energy Imports</h3>
+                        <div class="mt-2 text-3xl font-bold text-stone-800">63% <span class="text-lg font-normal text-stone-500">Dependence</span></div>
+                        <p class="text-sm text-stone-600 mt-2">Up from 48% in 2020. LNG and coal imports pose massive currency and price-volatility risks.</p>
+                    </div>
+                    <div class="text-right mt-4"><span class="text-xl">&#128201;</span></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between border-l-4 border-l-emerald-600">
+                    <div>
+                        <h3 class="text-sm font-semibold text-stone-500 uppercase tracking-wider">New Government RE Target</h3>
+                        <div class="mt-2 text-3xl font-bold text-emerald-700">10,000 <span class="text-lg font-normal text-stone-500">MW Solar</span></div>
+                        <p class="text-sm text-stone-600 mt-2">Target set for 2030, pivoting from fossil-heavy models, but hindered by grid integration and governance deficits.</p>
+                    </div>
+                    <div class="text-right mt-4"><span class="text-xl">&#9728;</span></div>
+                </div>
+
+                <!-- Charts -->
+                <div class="md:col-span-2 bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-semibold text-stone-800 mb-4">Capacity Overhang & Demand (GW)</h3>
+                    <div class="chart-container">
+                        <canvas id="capacityChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-semibold text-stone-800 mb-4">Current Generation Mix (Est.)</h3>
+                    <div class="chart-container">
+                        <canvas id="mixChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Value Chain Section -->
+        <section id="value-chain" class="scroll-mt-24">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-900 border-b-2 border-emerald-600 pb-2 inline-block">Value Chain & Stakeholder Map</h2>
+                <p class="text-stone-600 mt-3 max-w-3xl leading-relaxed">
+                    To effectively target our advisory, we must map the flow of energy and identify key actors at each node. This section visualizes the transition from fuel supply to the end customer. Hover over each node to reveal the primary stakeholders and their most pressing sustainability pain points.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm overflow-x-auto">
+                <div class="min-w-[800px] flex items-stretch justify-between space-x-2">
+                    
+                    <!-- Node 1 -->
+                    <div class="flex-1 group relative">
+                        <div class="h-full border-2 border-stone-200 bg-stone-50 rounded-lg p-4 transition-colors group-hover:border-emerald-500 group-hover:bg-emerald-50 cursor-pointer">
+                            <div class="text-2xl mb-2">&#9981;</div>
+                            <h4 class="font-bold text-stone-800">Fuel Supply</h4>
+                            <p class="text-xs text-stone-500 mt-1">Gas/LNG, Coal, HFO Logistics</p>
+                            
+                            <div class="hidden group-hover:block absolute z-10 top-full mt-2 left-0 w-64 bg-white border border-stone-200 shadow-lg rounded-lg p-4 text-sm">
+                                <strong class="text-stone-800">Key Actors:</strong> Petrobangla, BPC, Port Authorities.<br>
+                                <strong class="text-stone-800 mt-2 block">Pain Points:</strong> Scope 3 emissions tracing, climate physical risks to port infrastructure, volatile import costs, transition risk for coal handlers.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center text-stone-400 text-2xl font-bold px-1">&#8594;</div>
+
+                    <!-- Node 2 -->
+                    <div class="flex-1 group relative">
+                        <div class="h-full border-2 border-emerald-600 bg-emerald-50 rounded-lg p-4 transition-colors cursor-pointer shadow-sm">
+                            <div class="text-2xl mb-2">&#9881;</div>
+                            <h4 class="font-bold text-emerald-800">Generation</h4>
+                            <p class="text-xs text-stone-600 mt-1">SOEs, IPPs, JV Plants, Captive, Grid-RE</p>
+                            
+                            <div class="hidden group-hover:block absolute z-10 top-full mt-2 left-0 w-64 bg-white border border-stone-200 shadow-lg rounded-lg p-4 text-sm">
+                                <strong class="text-stone-800">Key Actors:</strong> BPDB, NWPGCL, APSCL, EGCB, Private IPPs.<br>
+                                <strong class="text-stone-800 mt-2 block">Pain Points:</strong> Asset stranding, stack emissions compliance, poor ESG data for DFI refinancing, shifting from capacity-payment models to competitive RE bids.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center text-stone-400 text-2xl font-bold px-1">&#8594;</div>
+
+                    <!-- Node 3 -->
+                    <div class="flex-1 group relative">
+                        <div class="h-full border-2 border-stone-200 bg-stone-50 rounded-lg p-4 transition-colors group-hover:border-emerald-500 group-hover:bg-emerald-50 cursor-pointer">
+                            <div class="text-2xl mb-2">&#128498;</div>
+                            <h4 class="font-bold text-stone-800">Grid & Storage</h4>
+                            <p class="text-xs text-stone-500 mt-1">Transmission, BESS, Ancillary</p>
+                            
+                            <div class="hidden group-hover:block absolute z-10 top-full mt-2 -left-16 w-64 bg-white border border-stone-200 shadow-lg rounded-lg p-4 text-sm">
+                                <strong class="text-stone-800">Key Actors:</strong> PGCB, NLDC.<br>
+                                <strong class="text-stone-800 mt-2 block">Pain Points:</strong> Integrating variable RE without destabilizing the grid, lack of clear BESS regulations/tariffs, grid modernization (SCADA) cybersecurity risks.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center text-stone-400 text-2xl font-bold px-1">&#8594;</div>
+
+                    <!-- Node 4 -->
+                    <div class="flex-1 group relative">
+                        <div class="h-full border-2 border-stone-200 bg-stone-50 rounded-lg p-4 transition-colors group-hover:border-emerald-500 group-hover:bg-emerald-50 cursor-pointer">
+                            <div class="text-2xl mb-2">&#127981;</div>
+                            <h4 class="font-bold text-stone-800">Off-takers</h4>
+                            <p class="text-xs text-stone-500 mt-1">DISCOMs, Export RMGs</p>
+                            
+                            <div class="hidden group-hover:block absolute z-10 top-full mt-2 -right-8 w-64 bg-white border border-stone-200 shadow-lg rounded-lg p-4 text-sm">
+                                <strong class="text-stone-800">Key Actors:</strong> REB, DPDC, DESCO, Garment Manufacturers.<br>
+                                <strong class="text-stone-800 mt-2 block">Pain Points:</strong> Distribution losses, CBAM compliance for RMGs forcing demand for Corporate PPAs/Green attributes, tariff affordability.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Thematic Opportunity Matrix -->
+        <section id="opportunities" class="scroll-mt-24">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-900 border-b-2 border-emerald-600 pb-2 inline-block">Advisory Opportunities Matrix</h2>
+                <p class="text-stone-600 mt-3 max-w-3xl leading-relaxed">
+                    This interactive matrix distills 13 core sustainability themes into actionable intelligence. Select a theme from the left menu to view the specific "Jobs to be Done" for plant operators (compliance, strategic intent, and execution struggles), alongside tailored, high-value advisory offerings our boutique firm can pitch.
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden min-h-[550px]">
+                
+                <!-- Sidebar: Themes List -->
+                <div class="w-full md:w-1/3 bg-stone-50 border-r border-stone-200 custom-scrollbar overflow-y-auto max-h-[400px] md:max-h-[600px]">
+                    <ul id="theme-list" class="flex flex-col text-sm">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Main Content: Theme Details -->
+                <div class="w-full md:w-2/3 p-6 lg:p-8 custom-scrollbar overflow-y-auto max-h-[600px]" id="theme-detail-pane">
+                    <div class="h-full flex flex-col items-center justify-center text-stone-400">
+                        <div class="text-4xl mb-3">&#8592;</div>
+                        <p>Select a thematic area to explore advisory opportunities.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Action Plan -->
+        <section id="action-plan" class="scroll-mt-24 mb-16">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-900 border-b-2 border-emerald-600 pb-2 inline-block">90-Day BD Execution Plan</h2>
+                <p class="text-stone-600 mt-3 max-w-3xl leading-relaxed">
+                    A pragmatic roadmap to establish our presence, leverage field visits, and secure initial bridgehead diagnostic projects that convert into long-term advisory mandates.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center font-bold text-stone-600 border border-stone-300 mr-4">1</div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-800">Days 1–30: Intelligence & "Wedges"</h4>
+                        <ul class="mt-2 space-y-1 text-sm text-stone-600 list-disc list-inside">
+                            <li>Identify 5–8 target IPPs facing imminent DFI refinancing or compliance pressure.</li>
+                            <li>Develop brief "teasers" focusing on pain points: Grid curtailment, ESG data gaps, Asset stranding.</li>
+                            <li>Formalize local partnerships (e.g., local engineering firms, universities) to augment our boutique footprint.</li>
+                            <li><strong>Wedge Offerings:</strong> Quick ESG maturity diagnostic, High-level BESS integration study.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center font-bold text-emerald-700 border border-emerald-300 mr-4">2</div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-800">Days 30–60: Pilot Conversations & Diagnostics</h4>
+                        <ul class="mt-2 space-y-1 text-sm text-stone-600 list-disc list-inside">
+                            <li>Leverage current field contacts visiting plants: Equip them with 1-pagers specific to Gas, Coal, or RE assets.</li>
+                            <li>Propose "no-regrets" 2-4 week rapid assessments (loss reduction or E&S gap analysis) at modest/success-based fees.</li>
+                            <li>Engage DFIs (ADB, World Bank) as an agile execution partner for their local Technical Assistance (TA) grants.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-700 border border-amber-300 mr-4">3</div>
+                    <div>
+                        <h4 class="text-lg font-bold text-stone-800">Days 60–90: Conversion & Flagship Setup</h4>
+                        <ul class="mt-2 space-y-1 text-sm text-stone-600 list-disc list-inside">
+                            <li>Convert pilot diagnostic findings into multi-month structured programs (e.g., 12-month ESG buildout, MACC roadmap).</li>
+                            <li>Secure one "Flagship" engagement (e.g., ESG architecture for a marquee IPP or BPDB entity) for future credentialing.</li>
+                            <li>Convene a private roundtable: Connect a progressive Distribution Utility with RMG Exporters to workshop Corporate PPAs.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm">
+            <p>&copy; 2026 Boutique Sustainability Advisory. Internal Confidential.</p>
+            <p class="mt-2 md:mt-0">Sources: IEEFA, Transparency International Bangladesh, Field Research.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Data Store for Thematic Matrix
+        const themeData = [
+            {
+                id: 't1',
+                title: '1. Decarbonisation & GHG (Scope 1–3)',
+                icon: '&#127780;',
+                context: 'Emissions are tied heavily to combustion/auxiliary power. Increasing pressure from NDCs and global net-zero ambitions.',
+                mustDo: ['Report basic emissions for regulatory compliance.', 'Adhere to national environmental standards.'],
+                wantToDo: ['Align with corporate net-zero strategy.', 'Reduce fuel costs via operational efficiency.'],
+                struggleTo: ['Accurately measure Scope 3 (fuel extraction/logistics).', 'Set credible baselines and model MACCs.', 'Finance internal decarbonisation.'],
+                offerings: [
+                    { name: 'GHG Inventory Build-out', desc: 'Establish ISO 14064/GHG Protocol compliant boundaries and calculation tools.', size: '$30k-$60k', duration: '6-8 weeks' },
+                    { name: 'Decarbonisation Strategy & MACC', desc: 'Marginal Abatement Cost Curve modeling for asset portfolios.', size: '$50k-$100k', duration: '12 weeks' }
+                ]
+            },
+            {
+                id: 't2',
+                title: '2. RE, BESS & Grid Flexibility',
+                icon: '&#9889;',
+                context: 'Aggressive 10GW solar target by 2030, but blocked by intermittency, grid constraints, land issues, and lack of BESS regulatory frameworks.',
+                mustDo: ['Integrate generated RE without tripping grid stability.', 'Navigate complex public land PPP guidelines.'],
+                wantToDo: ['Add BESS for peak shaving/ancillary revenues.', 'Deploy hybrid solar+gas configurations.'],
+                struggleTo: ['Build bankable techno-economic models for BESS without clear tariff structures.', 'Secure off-take payment guarantees.'],
+                offerings: [
+                    { name: 'BESS Techno-Economic Modelling', desc: 'Business case analysis for storage integration at specific sub-stations.', size: '$40k-$80k', duration: '8 weeks' },
+                    { name: 'CPPA Regulatory Advisory', desc: 'Analysis of open-access frameworks for corporate PPAs between IPPs and RMGs.', size: '$25k-$50k', duration: '6 weeks' }
+                ]
+            },
+            {
+                id: 't3',
+                title: '3. ESG & Sustainability Reporting',
+                icon: '&#128203;',
+                context: 'DFIs and international off-takers are demanding rigorous reporting, yet local adoption of GRI/ISSB is fragmented or tokenistic.',
+                mustDo: ['Comply with local environmental reporting & central bank green rules.', 'Meet basic DFI covenants.'],
+                wantToDo: ['Publish international standard reports (GRI, TCFD) to attract cheaper capital.', 'Improve ESG ratings.'],
+                struggleTo: ['Conduct genuine double materiality.', 'Consolidate fragmented ESG data across plants.', 'Engage boards on climate risk.'],
+                offerings: [
+                    { name: 'ESG Materiality & Architecture', desc: 'Define KPIs, governance frameworks, and data collection protocols.', size: '$45k-$75k', duration: '10 weeks' },
+                    { name: 'Pre-DD Readiness Review', desc: 'Mock due-diligence to prepare for DFI/Investor scrutiny.', size: '$20k-$40k', duration: '4 weeks' }
+                ]
+            },
+            {
+                id: 't4',
+                title: '4. Environmental Compliance',
+                icon: '&#127811;',
+                context: 'Stricter enforcement looming. Major pain points around SOx/NOx, ash ponds, and cooling water discharge vs IFC Performance Standards.',
+                mustDo: ['Meet DoE EIA requirements and stack emission limits.', 'Manage solid waste/ash.'],
+                wantToDo: ['Achieve "Compliance Plus" to align with IFC/Equator Principles ahead of refinancing.'],
+                struggleTo: ['Maintain continuous monitoring systems.', 'Manage coal stockpile runoff.', 'Upgrade legacy effluent treatment.'],
+                offerings: [
+                    { name: 'E&S Risk Diagnostics', desc: 'Gap analysis of current plant operations against IFC Performance Standards.', size: '$25k-$45k', duration: '4-6 weeks' },
+                    { name: 'EnMS (ISO 50001) Implementation', desc: 'Design and rollout of Energy Management Systems.', size: '$35k-$60k', duration: '12 weeks' }
+                ]
+            },
+            {
+                id: 't5',
+                title: '5. Social, Labour & Just Transition',
+                icon: '&#129309;',
+                context: 'Land acquisition conflicts, community grievances, and contractor labor standards are severe risks. Retirement of old fossil plants raises Just Transition issues.',
+                mustDo: ['Manage land resettlement basic compliance.', 'Maintain OHS standards.'],
+                wantToDo: ['Secure social license to operate for new RE projects.', 'Design effective community CSR.'],
+                struggleTo: ['Implement robust grievance mechanisms.', 'Ensure contractor adherence to labor rights.', 'Plan for workforce reskilling during plant decommissioning.'],
+                offerings: [
+                    { name: 'Just Transition Planning', desc: 'Socio-economic impact assessment and reskilling roadmaps for retiring thermal plants.', size: '$40k-$70k', duration: '10 weeks' },
+                    { name: 'Grievance Mechanism Design', desc: 'Establish DFI-compliant stakeholder engagement frameworks.', size: '$20k-$35k', duration: '6 weeks' }
+                ]
+            },
+            {
+                id: 't6',
+                title: '6. Climate Risk & Resilience',
+                icon: '&#127754;',
+                context: 'High vulnerability to cyclones, flooding, and heat stress. Lenders are increasingly demanding physical risk pricing.',
+                mustDo: ['Basic flood protection and emergency planning.'],
+                wantToDo: ['Integrate climate risk into ERM.', 'Climate-proof new asset designs.'],
+                struggleTo: ['Conduct granular, asset-level vulnerability mapping using climate models.', 'Justify resilience CapEx.'],
+                offerings: [
+                    { name: 'Asset Vulnerability Mapping', desc: 'Site-specific physical risk modeling against RCP scenarios.', size: '$30k-$60k', duration: '8 weeks' },
+                    { name: 'TCFD / Transition Plan Support', desc: 'Translating physical and transition risks into financial disclosures.', size: '$50k-$90k', duration: '12 weeks' }
+                ]
+            },
+            {
+                id: 't7',
+                title: '7. Operational Efficiency & Loss',
+                icon: '&#9881;',
+                context: 'Aging fleet has poor heat rates. High transmission & distribution losses erode utility financials.',
+                mustDo: ['Maintain base availability/uptime.'],
+                wantToDo: ['Reduce auxiliary consumption.', 'Optimize combustion/heat recovery.', 'Reduce technical grid losses.'],
+                struggleTo: ['Implement digital/predictive maintenance.', 'Train operators on new control systems.', 'Finance turbine upgrades.'],
+                offerings: [
+                    { name: 'Plant Efficiency Diagnostics', desc: 'Rapid assessment identifying low-capex operational improvements.', size: '$25k-$50k', duration: '4-6 weeks' },
+                    { name: 'Digital Analytics Use-Case Design', desc: 'Roadmap for implementing AI/data historians for loss detection.', size: '$30k-$50k', duration: '6 weeks' }
+                ]
+            },
+            {
+                id: 't8',
+                title: '8. Carbon Markets & Article 6',
+                icon: '&#128178;',
+                context: 'Legacy CDM knowledge exists, but voluntary markets and Article 6 frameworks are largely unexploited.',
+                mustDo: ['Understand emerging national carbon market frameworks.'],
+                wantToDo: ['Monetize RE, BESS, or efficiency upgrades via carbon credits.'],
+                struggleTo: ['Prove additionality.', 'Navigate methodology selection and MRV design.', 'Manage reputational risks of low-quality credits.'],
+                offerings: [
+                    { name: 'Carbon Project Feasibility', desc: 'Screening asset portfolios for viable credit generation opportunities.', size: '$20k-$40k', duration: '4-6 weeks' },
+                    { name: 'PDD & MRV Framework Design', desc: 'Developing Project Design Documents and monitoring plans.', size: '$40k-$80k', duration: '12 weeks' }
+                ]
+            },
+            {
+                id: 't9',
+                title: '9. Finance, DFIs & Incentives',
+                icon: '&#128181;',
+                context: 'Shift away from BPDB sovereign guarantees towards blended finance, requiring stringent DFI ESG compliance.',
+                mustDo: ['Secure debt servicing capability amidst subsidy cuts.'],
+                wantToDo: ['Access concessional green finance (GCF, ADB).', 'Utilize green bonds.'],
+                struggleTo: ['Structure bankable PPPs.', 'Meet complex multi-lateral environmental and social safeguards (e.g., gender action plans).'],
+                offerings: [
+                    { name: 'DFI Safeguard Alignment', desc: 'Turnkey advisory to align project docs with World Bank/ADB E&S frameworks.', size: '$50k-$100k', duration: '10-14 weeks' },
+                    { name: 'Gender & Diversity Action Plans', desc: 'Designing inclusive supply-chain and employment strategies mandated by DFIs.', size: '$20k-$35k', duration: '6 weeks' }
+                ]
+            },
+            {
+                id: 't10',
+                title: '10. Data, Digitalisation & MRV',
+                icon: '&#128187;',
+                context: 'Data is siloed, manual (spreadsheets), and lacks auditability, threatening ESG reporting integrity.',
+                mustDo: ['Submit operational data to regulators.'],
+                wantToDo: ['Implement automated ESG dashboards.', 'Integrate SCADA with ERPs.'],
+                struggleTo: ['Ensure data granularity and governance.', 'Move away from manual spreadsheet MRV.'],
+                offerings: [
+                    { name: 'ESG Data Architecture', desc: 'Designing automated data pipelines and KPI dashboards.', size: '$40k-$75k', duration: '10 weeks' },
+                    { name: 'Cybersecurity OT Maturity Review', desc: 'Assessments for grid/plant operational technology resilience.', size: '$30k-$60k', duration: '6-8 weeks' }
+                ]
+            },
+            {
+                id: 't11',
+                title: '11. Policy & Regulatory Reform',
+                icon: '&#128220;',
+                context: 'Sector undergoing chaotic reform: subsidy phase-outs, IMF pressures, capacity payment debates.',
+                mustDo: ['React to ad-hoc tariff hikes and policy shifts.'],
+                wantToDo: ['Advocate for stable RE procurement frameworks.', 'Secure favorable PPAs.'],
+                struggleTo: ['Engage in structured policy dialogue with BERC/SREDA based on techno-economic evidence.'],
+                offerings: [
+                    { name: 'Regulatory Scenario Analysis', desc: 'Modeling impacts of subsidy removal and tariff shifts on IPP portfolios.', size: '$25k-$50k', duration: '6 weeks' },
+                    { name: 'Policy Position Papers', desc: 'Evidence-based advocacy documents for industry associations.', size: '$15k-$30k', duration: '4 weeks' }
+                ]
+            },
+            {
+                id: 't12',
+                title: '12. Supply-chain ESG (RMGs)',
+                icon: '&#128085;',
+                context: 'Export sectors (textiles) face EU CBAM and global buyer net-zero targets, driving desperate need for green power.',
+                mustDo: ['Report Scope 2 emissions to global apparel brands.'],
+                wantToDo: ['Procure 100% RE via corporate PPAs or rooftop solar.'],
+                struggleTo: ['Navigate grid-wheeling regulations.', 'Source verifiable RE certificates locally.'],
+                offerings: [
+                    { name: 'Corporate PPA Matchmaking', desc: 'Bridging IPPs generating RE with industrial RMG off-takers.', size: '$30k-$60k', duration: '8 weeks' },
+                    { name: 'Scope 2 Decarbonisation Roadmap', desc: 'Energy procurement strategies for industrial parks.', size: '$35k-$60k', duration: '8 weeks' }
+                ]
+            },
+            {
+                id: 't13',
+                title: '13. Nature & Water Co-benefits',
+                icon: '&#128167;',
+                context: 'Thermal plants stress water resources; floating solar impacts ecosystems. Solar irrigation nexus risks groundwater depletion.',
+                mustDo: ['Adhere to baseline water withdrawal permits.'],
+                wantToDo: ['Implement nature-based solutions (e.g., mangrove protection near coastal plants) for resilience.'],
+                struggleTo: ['Conduct hydrogeological assessments.', 'Design biodiversity offset programs.'],
+                offerings: [
+                    { name: 'Water Stewardship Plans', desc: 'Assessments optimizing cooling water use and minimizing thermal discharge impact.', size: '$30k-$50k', duration: '8 weeks' },
+                    { name: 'Solar-Irrigation Water Nexus Study', desc: 'Assessing groundwater depletion risks for agricultural solar rollouts.', size: '$25k-$45k', duration: '6 weeks' }
+                ]
+            }
+        ];
+
+        // Initialization function
+        function init() {
+            renderCharts();
+            renderThemeList();
+            // Load first theme by default
+            selectTheme(themeData[0].id);
+        }
+
+        // Render the list of themes in the sidebar
+        function renderThemeList() {
+            const listEl = document.getElementById('theme-list');
+            themeData.forEach(theme => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <button class="w-full text-left px-4 py-3 border-b border-stone-200 hover:bg-stone-100 transition nav-item focus:outline-none" data-id="${theme.id}" onclick="selectTheme('${theme.id}')">
+                        <span class="mr-2">${theme.icon}</span> ${theme.title}
+                    </button>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // Handle theme selection and update the detail pane
+        function selectTheme(themeId) {
+            // Update active state in menu
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[data-id="${themeId}"]`).classList.add('active');
+
+            const theme = themeData.find(t => t.id === themeId);
+            const pane = document.getElementById('theme-detail-pane');
+
+            // Generate HTML for details
+            let html = `
+                <div class="mb-6 fade-in">
+                    <h3 class="text-2xl font-bold text-stone-900 flex items-center"><span class="text-3xl mr-3">${theme.icon}</span> ${theme.title}</h3>
+                    <p class="text-stone-600 mt-2 p-3 bg-stone-50 border-l-4 border-emerald-600 text-sm italic">${theme.context}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8 fade-in" style="animation-delay: 0.1s;">
+                    <div class="bg-stone-50 p-4 border border-stone-200 rounded-lg">
+                        <h4 class="font-bold text-stone-800 text-sm uppercase tracking-wide border-b border-stone-300 pb-2 mb-2 text-red-700">Must Do (Compliance)</h4>
+                        <ul class="text-sm text-stone-600 list-disc list-outside ml-4 space-y-1">
+                            ${theme.mustDo.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 border border-stone-200 rounded-lg">
+                        <h4 class="font-bold text-stone-800 text-sm uppercase tracking-wide border-b border-stone-300 pb-2 mb-2 text-emerald-700">Want To Do (Strategic)</h4>
+                        <ul class="text-sm text-stone-600 list-disc list-outside ml-4 space-y-1">
+                            ${theme.wantToDo.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 border border-stone-200 rounded-lg">
+                        <h4 class="font-bold text-stone-800 text-sm uppercase tracking-wide border-b border-stone-300 pb-2 mb-2 text-amber-700">Struggle To Do (Pain)</h4>
+                        <ul class="text-sm text-stone-600 list-disc list-outside ml-4 space-y-1">
+                            ${theme.struggleTo.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="fade-in" style="animation-delay: 0.2s;">
+                    <h4 class="text-lg font-bold text-stone-900 mb-4 border-b border-stone-200 pb-2">Concrete Advisory Offerings</h4>
+                    <div class="space-y-4">
+                        ${theme.offerings.map(off => `
+                            <div class="border border-emerald-100 bg-white p-4 rounded-lg shadow-sm hover:border-emerald-400 transition-colors relative overflow-hidden group">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-600 group-hover:w-2 transition-all"></div>
+                                <div class="pl-3">
+                                    <h5 class="font-bold text-stone-800 text-base">${off.name}</h5>
+                                    <p class="text-sm text-stone-600 mt-1">${off.desc}</p>
+                                    <div class="mt-3 flex space-x-4 text-xs font-medium text-stone-500">
+                                        <span class="bg-stone-100 px-2 py-1 rounded">Size: ${off.size}</span>
+                                        <span class="bg-stone-100 px-2 py-1 rounded">Duration: ${off.duration}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            pane.innerHTML = html;
+        }
+
+        // Render Chart.js Visualizations
+        function renderCharts() {
+            // Chart 1: Capacity vs Demand
+            const ctxCap = document.getElementById('capacityChart').getContext('2d');
+            new Chart(ctxCap, {
+                type: 'bar',
+                data: {
+                    labels: ['FY 2020-21', 'FY 2024-25 (Est.)'],
+                    datasets: [
+                        {
+                            label: 'Peak Demand (GW)',
+                            data: [14, 17],
+                            backgroundColor: '#047857', // Emerald 700
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Installed Capacity (GW)',
+                            data: [22, 27.4],
+                            backgroundColor: '#d97706', // Amber 600
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' GW';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e7e5e4' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: Generation Mix
+            const ctxMix = document.getElementById('mixChart').getContext('2d');
+            new Chart(ctxMix, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Natural Gas / LNG', 'Coal', 'HFO / Diesel', 'Renewables / Hydro', 'Cross-Border Power'],
+                    datasets: [{
+                        data: [50, 20, 15, 5, 10], // Indicative distribution based on brief context
+                        backgroundColor: [
+                            '#d6d3d1', // Stone 300 (Gas)
+                            '#44403c', // Stone 700 (Coal)
+                            '#78716c', // Stone 500 (Oil)
+                            '#059669', // Emerald 600 (RE)
+                            '#d97706'  // Amber 600 (Import)
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { 
+                            position: 'right',
+                            labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ~' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</body>
+</html>
